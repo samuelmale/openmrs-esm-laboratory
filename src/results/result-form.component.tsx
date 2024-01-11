@@ -1,4 +1,10 @@
-import React, { useMemo, useState, createContext, useContext } from "react";
+import React, {
+  useMemo,
+  useState,
+  createContext,
+  useContext,
+  useCallback,
+} from "react";
 import styles from "./result-form.scss";
 import { Button, InlineLoading, ModalBody, ModalFooter } from "@carbon/react";
 import { useTranslation } from "react-i18next";
@@ -30,6 +36,13 @@ const ResultForm: React.FC<ResultFormProps> = ({ order, patientUuid }) => {
   const [inputValues, setInputValues] = useState({});
   const formValuesContext = createContext({});
 
+  const setFormFieldValue = (fieldId, value) => {
+    setInputValues({
+      ...inputValues,
+      [fieldId]: value,
+    });
+  };
+
   const setFormValues = (val) => {
     setInputValues(val);
   };
@@ -56,8 +69,7 @@ const ResultForm: React.FC<ResultFormProps> = ({ order, patientUuid }) => {
             <formValuesContext.Provider value={{ inputValues, setFormValues }}>
               <ResultFormField
                 concept={member}
-                setFormValues={setFormValues}
-                inputValues={inputValues}
+                setFormFieldValue={setFormFieldValue}
               />
             </formValuesContext.Provider>
           );
@@ -68,8 +80,7 @@ const ResultForm: React.FC<ResultFormProps> = ({ order, patientUuid }) => {
           <formValuesContext.Provider value={{ inputValues, setFormValues }}>
             <ResultFormField
               concept={concept}
-              setFormValues={setFormValues}
-              inputValues={inputValues}
+              setFormFieldValue={setFormFieldValue}
             />
           </formValuesContext.Provider>
         );

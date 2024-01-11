@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styles from "./result-form.scss";
 import { TextInput, Select, SelectItem } from "@carbon/react";
 import { useTranslation } from "react-i18next";
@@ -7,23 +7,19 @@ import { ConceptReference } from "./result-form.resource";
 
 interface ResultFormFieldProps {
   concept: ConceptReference;
-  setFormValues?: (value: any) => void;
-  inputValues?: any;
+  setFormFieldValue?: (fieldId: string, value: any) => void;
 }
 const ResultFormField: React.FC<ResultFormFieldProps> = ({
   concept,
-  setFormValues,
-  inputValues,
+  setFormFieldValue,
 }) => {
   const { t } = useTranslation();
 
-  // getInput values
-  const handleInputChange = (memberUuid, value) => {
-    setFormValues((prevValues) => ({
-      ...prevValues,
-      [memberUuid]: value,
-    }));
-  };
+  const [value, setValue] = React.useState();
+
+  useEffect(() => {
+    setFormFieldValue(concept.uuid, value);
+  }, [concept.uuid, value]);
 
   // create input fields
   if (concept === undefined) {
@@ -43,9 +39,9 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({
         id={`member-${concept.uuid}-test-id`}
         type={concept.datatype.display === "Numeric" ? "number" : "text"}
         labelText={concept?.display}
-        value={inputValues[`${concept.uuid}`] || ""}
+        value={value}
         onChange={(e) => {
-          handleInputChange(concept.uuid, e.target.value);
+          setValue(e.target.value);
         }}
       />
     );
@@ -58,9 +54,9 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({
         id={`member-${concept.uuid}-test-id`}
         type="text"
         labelText={concept?.display}
-        value={inputValues[`${concept.uuid}`]}
+        value={value}
         onChange={(e) => {
-          handleInputChange(concept.uuid, e.target.value);
+          setValue(e.target.value);
         }}
       >
         <SelectItem text={t("option", "Choose an Option")} value="" />
