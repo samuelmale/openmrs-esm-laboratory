@@ -3,10 +3,10 @@ import { Tab, Tabs, TabList, TabPanels, TabPanel, Search } from "@carbon/react";
 
 const ApprovedComponent = () => {
   return (
-    <TabPanel>
+    <div>
       <h1>Hello, React!</h1>
       <p>This is a sample React component.</p>
-    </TabPanel>
+    </div>
   );
 };
 

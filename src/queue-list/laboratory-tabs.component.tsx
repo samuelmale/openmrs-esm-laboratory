@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   type AssignedExtension,
   Extension,
   ExtensionSlot,
   useConnectedExtensions,
+  attach,
+  detachAll,
 } from "@openmrs/esm-framework";
 import { Tab, Tabs, TabList, TabPanels, TabPanel, Search } from "@carbon/react";
 import { useTranslation } from "react-i18next";
@@ -29,9 +31,47 @@ const LaboratoryQueueTabs: React.FC = () => {
   const tabExtensions = useConnectedExtensions(
     labPanelSlot
   ) as AssignedExtension[];
+  const [derivedSlots, setDerivedSlots] = useState<
+    { slot: string; extension: string }[]
+  >([]);
 
-  // eslint-disable-next-line no-console
-  console.log(tabExtensions);
+  const extraPanels = useMemo(() => {
+    const filteredExtensions = tabExtensions.filter(
+      (extension) => Object.keys(extension.meta).length > 0
+    );
+    const derivedSlotsBuffer = [];
+    return filteredExtensions.map((extension, index) => {
+      const slotName = `${labPanelSlot}-${index}`;
+      derivedSlotsBuffer.push({
+        slot: slotName,
+        extension: extension.name,
+      });
+      if (filteredExtensions.length === index + 1) {
+        setDerivedSlots(derivedSlotsBuffer);
+      }
+
+      return (
+        <TabPanel key={extension.meta.name} style={{ padding: 0 }}>
+          <div>
+            <div className={styles.headerBtnContainer}></div>
+            <ExtensionSlot name={slotName} />
+          </div>
+        </TabPanel>
+      );
+    });
+  }, [tabExtensions?.length]);
+
+  useEffect(() => {
+    derivedSlots.forEach(({ slot, extension }) => {
+      attach(slot, extension);
+    });
+
+    return () => {
+      derivedSlots.forEach(({ slot }) => {
+        detachAll(slot);
+      });
+    };
+  }, [derivedSlots]);
 
   return (
     <main className={`omrs-main-content`}>
@@ -113,16 +153,8 @@ const LaboratoryQueueTabs: React.FC = () => {
                 <CompletedList fulfillerStatus={"COMPLETED"} />
               </div>
             </TabPanel>
-            <div>
-              {" "}
-              <TabPanel style={{ padding: 0 }}>
-                <div>
-                  <div className={styles.headerBtnContainer}></div>
-                  <CompletedList fulfillerStatus={"COMPLETED"} />
-                </div>
-              </TabPanel>
-            </div>
-            <ExtensionSlot name={labPanelSlot} state={{}} />
+            {/* <ExtensionSlot name={labPanelSlot} style={{ display: "hidden" }} /> */}
+            {extraPanels}
             {/* <TabPanel>
                 <Extension />
               </TabPanel>
