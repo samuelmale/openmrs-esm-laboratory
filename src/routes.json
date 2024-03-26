@@ -1,7 +1,6 @@
 {
     "$schema": "https://json.openmrs.org/routes.schema.json",
     "backendDependencies": {
-        "fhir2": ">=1.2",
         "webservices.rest": "^2.24.0"
     },
     "pages": [
@@ -27,24 +26,8 @@
             }
         },
         {
-            "name": "add-to-worklist-dialog",
-            "component": "addToWorklistDialog"
-        },
-        {
             "name": "pickup-lab-request-modal",
             "component": "pickupLabRequestModal"
-        },
-        {
-            "name": "results-summary",
-            "component": "resultsSummaryWorkSpace"
-        },
-        {
-            "name": "edit-results-dialog",
-            "component": "editResultsDialog"
-        },
-        {
-            "name": "send-email-dialog",
-            "component": "sendEmailDialog"
         },
         {
             "name": "reject-lab-request-modal",
@@ -71,7 +54,7 @@
         {
             "name": "tests-ordered-tile-component",
             "slot": "lab-tiles-slot",
-            "component": "testOrderedTileComponent",
+            "component": "testOrderedTile",
             "meta": {
                 "name": "testsOrderedTileSlot",
                 "title": "Ordered tests"
@@ -80,7 +63,7 @@
         {
             "name": "completed-tile-component",
             "slot": "lab-tiles-slot",
-            "component": "completedTileComponent",
+            "component": "completedTile",
             "meta": {
                 "name": "completedTileSlot",
                 "title": "Completed"
@@ -89,7 +72,7 @@
         {
             "name": "worklist-tile-component",
             "slot": "lab-tiles-slot",
-            "component": "worklistTileComponent",
+            "component": "worklistTile",
             "meta": {
                 "name": "worklisTileSlot",
                 "title": "Worklist"
@@ -98,12 +81,22 @@
         {
             "name": "pick-lab-request-action",
             "component": "pickupLabRequestAction",
-            "slot": "order-actions-slot"
+            "slot": "tests-ordered-actions-slot"
         },
         {
-            "name": "reject-lab-request-action",
+            "name": "reject-lab-request-tests-ordered-action",
             "component": "rejectLabRequestAction",
-            "slot": "order-actions-slot"
+            "slot": "tests-ordered-actions-slot"
+        },
+        {
+            "name": "add-lab-request-results-action",
+            "component": "addLabRequestResultsAction",
+            "slot": "inprogress-tests-actions-slot"
+        },
+        {
+            "name": "reject-lab-request-worklist-action",
+            "component": "rejectLabRequestAction",
+            "slot": "inprogress-tests-actions-slot"
         }
     ]
 }
