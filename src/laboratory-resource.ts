@@ -14,7 +14,7 @@ export function useLabOrders(
   excludeCanceled = true
 ) {
   const { laboratoryOrderTypeUuid } = useConfig();
-  let url = `${restBaseUrl}/order?orderTypes=${laboratoryOrderTypeUuid}&v=full`;
+  let url = `${restBaseUrl}/order?orderTypes=${laboratoryOrderTypeUuid}&v=custom:(uuid,orderNumber,dateActivated,scheduledDate,dateStopped,autoExpireDate,orderReason,urgency,action,fulfillerStatus,orderer:(uuid,display),patient:(uuid,display),concept:(uuid,display),encounter:(uuid,display)`;
   url = status ? url + `&fulfillerStatus=${status}` : url;
   url = excludeCanceled
     ? `${url}&excludeCanceledAndExpired=true&excludeDiscontinueOrders=true`
