@@ -14,7 +14,7 @@ export function useLabOrders(
   excludeCanceled = true
 ) {
   const { laboratoryOrderTypeUuid } = useConfig();
-  let url = `${restBaseUrl}/order?orderTypes=${laboratoryOrderTypeUuid}&v=custom:(uuid,orderNumber,dateActivated,scheduledDate,dateStopped,autoExpireDate,orderReason,urgency,action,fulfillerStatus,orderer:(uuid,display),patient:(uuid,display),concept:(uuid,display),encounter:(uuid,display)`;
+  let url = `${restBaseUrl}/order?orderTypes=${laboratoryOrderTypeUuid}&v=custom:(uuid,orderNumber,dateActivated,scheduledDate,dateStopped,autoExpireDate,orderReason,urgency,action,fulfillerStatus,orderer:(uuid,display),patient:(uuid,display),concept:(uuid,display),encounter:(uuid,display),careSetting:(uuid,display)`;
   url = status ? url + `&fulfillerStatus=${status}` : url;
   url = excludeCanceled
     ? `${url}&excludeCanceledAndExpired=true&excludeDiscontinueOrders=true`
@@ -25,12 +25,18 @@ export function useLabOrders(
     data: { results: Array<Order> };
   }>(url, openmrsFetch, { refreshInterval });
 
+  console.log({ data });
   return {
-    labOrders: data?.data ? data.data.results : [],
+    labOrders: data?.data ? data.data.results.map(inferDisplay) : [],
     isLoading,
     isError: error,
     mutate,
   };
+}
+
+function inferDisplay(order: Order) {
+  order.display = order.concept.display;
+  return order;
 }
 
 export function setFulfillerStatus(

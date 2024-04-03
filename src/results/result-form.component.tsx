@@ -50,6 +50,8 @@ const ResultForm: React.FC<ResultFormProps> = ({ order, patientUuid }) => {
     }
   }, [patient, patientUuid]);
 
+  console.log({ concept });
+
   const onSubmit = (data, e) => {
     e.preventDefault();
     let obsValue = [];
