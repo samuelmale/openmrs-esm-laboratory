@@ -2,6 +2,7 @@ import { openmrsFetch, restBaseUrl, useConfig } from "@openmrs/esm-framework";
 import { FulfillerStatus } from "./types";
 import { Order } from "@openmrs/esm-patient-common-lib";
 import useSWR from "swr";
+import { useMemo } from "react";
 
 /**
  * Custom hook for retrieving laboratory orders based on the specified status.
@@ -10,12 +11,17 @@ import useSWR from "swr";
  * @param excludeCanceled - Whether to exclude canceled, discontinued and expired orders
  */
 export function useLabOrders(
-  status: FulfillerStatus = null,
+  status: "NEW" | FulfillerStatus = null,
   excludeCanceled = true
 ) {
+  const fulfillerStatus = useMemo(
+    () => (status === "NEW" ? null : status),
+    [status]
+  );
+  const newOrdersOnly = status === "NEW";
   const { laboratoryOrderTypeUuid } = useConfig();
-  let url = `${restBaseUrl}/order?orderTypes=${laboratoryOrderTypeUuid}&v=custom:(uuid,orderNumber,dateActivated,scheduledDate,dateStopped,autoExpireDate,orderReason,urgency,action,fulfillerStatus,orderer:(uuid,display),patient:(uuid,display),concept:(uuid,display),encounter:(uuid,display),careSetting:(uuid,display)`;
-  url = status ? url + `&fulfillerStatus=${status}` : url;
+  let url = `${restBaseUrl}/order?orderTypes=${laboratoryOrderTypeUuid}&v=custom:(uuid,orderNumber,dateActivated,scheduledDate,dateStopped,autoExpireDate,orderReason,urgency,action,fulfillerStatus,orderer:(uuid,display),patient:(uuid,display),concept:(uuid,display),encounter:(uuid,display),careSetting:(uuid,display),orderType:(uuid,display)`;
+  url = fulfillerStatus ? url + `&fulfillerStatus=${fulfillerStatus}` : url;
   url = excludeCanceled
     ? `${url}&excludeCanceledAndExpired=true&excludeDiscontinueOrders=true`
     : url;
@@ -25,9 +31,15 @@ export function useLabOrders(
     data: { results: Array<Order> };
   }>(url, openmrsFetch, { refreshInterval });
 
-  console.log({ data });
+  const filteredOrders =
+    data?.data &&
+    newOrdersOnly &&
+    data.data.results.filter((order) => {
+      return order?.action === "NEW" && order?.fulfillerStatus === null;
+    });
+
   return {
-    labOrders: data?.data ? data.data.results.map(inferDisplay) : [],
+    labOrders: filteredOrders || data?.data.results || [],
     isLoading,
     isError: error,
     mutate,
